@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -10,6 +10,6 @@ export default defineConfig({
   },
   datasource: { url: env("DATABASE_URL") },
   ...({
-    adapter: async () => new PrismaBetterSqlite3({ url: env("DATABASE_URL") }),
+    adapter: async () => new PrismaPg({ connectionString: env("DATABASE_URL") }),
   } as object),
 });
