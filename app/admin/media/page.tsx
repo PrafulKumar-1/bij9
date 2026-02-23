@@ -1,12 +1,12 @@
 import { readdir } from "node:fs/promises";
 import path from "node:path";
+import { getStore } from "@netlify/blobs";
 
 import { MediaUploadForm } from "@/components/admin/media-upload-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function AdminMediaPage() {
-  const uploadRoot = path.join(process.cwd(), "public", "uploads");
-  const files = await listUploadedFiles(uploadRoot);
+  const files = await listUploadedFiles();
 
   return (
     <div className="space-y-6">
@@ -33,8 +33,19 @@ export default async function AdminMediaPage() {
   );
 }
 
-async function listUploadedFiles(root: string) {
+async function listUploadedFiles() {
+  if (process.env.STORAGE_PROVIDER === "netlify-blobs") {
+    try {
+      const store = getStore(process.env.NETLIFY_BLOBS_STORE || "globalmerch-uploads");
+      const listed = await store.list();
+      return listed.blobs.slice(0, 100).map((blob) => `/api/media/${blob.key}`).sort((a, b) => b.localeCompare(a));
+    } catch {
+      return [];
+    }
+  }
+
   try {
+    const root = path.join(process.cwd(), "public", "uploads");
     const folders = await readdir(root, { withFileTypes: true });
     const result: string[] = [];
 

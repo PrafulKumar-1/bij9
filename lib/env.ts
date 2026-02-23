@@ -1,7 +1,12 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().default("file:./dev.db"),
+  DATABASE_URL: z
+    .string()
+    .default("postgresql://postgres:postgres@localhost:5432/globalmerch?schema=public"),
+  DATABASE_PROVIDER: z.enum(["postgresql"]).default("postgresql"),
+  STORAGE_PROVIDER: z.enum(["local", "netlify-blobs"]).default("local"),
+  NETLIFY_BLOBS_STORE: z.string().optional(),
   ADMIN_EMAIL: z.string().email().default("admin@globalmerchexport.com"),
   ADMIN_PASSWORD: z.string().min(8).default("ChangeMe123!"),
   AUTH_SECRET: z.string().min(12).optional(),

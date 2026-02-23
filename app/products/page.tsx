@@ -13,6 +13,8 @@ export const metadata = buildPageMetadata({
   path: "/products",
 });
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductsPage({
   searchParams,
 }: {

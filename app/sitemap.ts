@@ -3,6 +3,8 @@ import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { absoluteUrl } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [products, categories] = await Promise.all([
     db.product.findMany({ where: { status: "published" }, select: { slug: true, updatedAt: true } }),

@@ -6,6 +6,8 @@ import { CtaStrip } from "@/components/sections/cta-strip";
 import { getCategoryBySlug } from "@/lib/data";
 import { buildPageMetadata } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);

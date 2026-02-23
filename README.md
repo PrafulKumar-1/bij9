@@ -1,145 +1,122 @@
 # GlobalMerch Export
 
-Production-ready Next.js B2B merchant exporter website (India -> Worldwide) with premium UI, product catalog, enquiry funnels, and auth-protected admin dashboard.
+Premium B2B merchant-export website (India -> Worldwide) built with Next.js App Router, Prisma, admin CMS, enquiry pipelines, and Netlify-ready deployment.
 
 ## Stack
 
-- Next.js (App Router) + TypeScript
-- TailwindCSS + shadcn-style UI components
-- Framer Motion (subtle premium animations)
-- Prisma ORM + SQLite (Prisma 7 config + better-sqlite3 adapter, Postgres-upgrade friendly)
-- Custom JWT admin auth (`/admin`)
-- React Hook Form + Zod validation
-- Local filesystem upload adapter (`/public/uploads`) with future S3/R2-ready abstraction
-- Email notifications via Resend or SMTP (Nodemailer)
-- SEO metadata + JSON-LD + dynamic OG image + sitemap + robots
+- Next.js 16 + TypeScript + Tailwind + Framer Motion
+- Prisma 7 + PostgreSQL (`@prisma/adapter-pg`)
+- Auth-protected admin dashboard (`/admin`)
+- React Hook Form + Zod
+- Durable media storage options:
+  - `local` (dev only)
+  - `netlify-blobs` (recommended on Netlify)
+- SEO metadata, JSON-LD, dynamic OG, sitemap, robots
 
-## Features Implemented
+## What works
 
-- Premium responsive public website:
-  - Home, Products, Product detail, Category detail
-  - Send Requirement, About, Compliance, Logistics, Contact
-  - Strong B2B CTAs on all pages
-- Product catalog:
-  - Search, category filter, sorting, pagination
-- Product detail:
-  - Gallery, specs table, packaging chips, brochure support, sticky enquiry panel
-- Admin dashboard (auth protected):
-  - Categories CRUD
-  - Products CRUD
-  - Media upload manager
-  - Enquiries status pipeline (New/Contacted/Quoted/Closed)
-  - Requirements status pipeline (New/Contacted/Quoted/Closed)
-  - CSV product import endpoint + page
-- End-to-end enquiry + requirement flow:
-  - Stores in database
-  - Sends admin email notifications
-- Seed data:
-  - 6 categories + 12 products including dehydrated mushroom, onion, garlic
-- Local placeholder image pack:
-  - `hero.jpg`, `map.jpg`, `category-*.jpg`, `product-*.jpg`
+- Public pages: Home, Products, Product detail, Categories, Request, About, Compliance, Logistics, Contact
+- Admin pages: Products/Categories CRUD, media uploads, enquiries, requirements, CSV import
+- Enquiry + requirement forms: validation, DB writes, email notifications
+- File uploads: type/size validation + rate limiting + secure admin-only upload folder
 
-## Project Structure
+## Project layout
 
-- `app/` routes and API handlers
-- `components/` reusable UI + page sections + admin/forms
-- `lib/` db/auth/storage/validators/seo/utils
-- `styles/` design tokens
+- `app/` routes + API
+- `components/` UI + sections + admin/forms
+- `lib/` auth/db/storage/validators/utils
 - `prisma/` schema + seed
-- `public/` media placeholders and uploads
+- `public/` placeholders + uploads
+- `netlify.toml` Netlify build/plugin config
 
-## Setup
+## Local setup
 
-1. Install dependencies:
+1. Install dependencies
 
 ```bash
 npm install
 ```
 
-2. Create env file:
+2. Create env
 
 ```bash
 cp .env.example .env
 ```
 
-3. Generate Prisma client:
+3. Set your local Postgres URL in `.env`
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/globalmerch?schema=public"
+```
+
+4. Generate Prisma client + push schema + seed
 
 ```bash
 npm run prisma:generate
-```
-
-4. Apply schema to local database:
-
-```bash
-npm run prisma:migrate
-```
-
-5. Seed database:
-
-```bash
+npm run prisma:push
 npm run prisma:seed
 ```
 
-6. Start dev server:
+5. Run app
 
 ```bash
 npm run dev
 ```
 
-## Admin Login
+## Netlify deployment (copy-paste friendly)
 
-- URL: `http://localhost:3000/admin/login`
-- Credentials come from `.env`:
-  - `ADMIN_EMAIL`
-  - `ADMIN_PASSWORD`
+1. Push this repo to GitHub.
+2. In Netlify: **Add new site -> Import from Git**.
+3. Build config is already in `netlify.toml`.
+   - Build command: `npm run prisma:generate && npm run build`
+4. Add these env vars in Netlify (Builds + Functions scopes):
 
-Seed behavior:
-- If `ADMIN_PASSWORD` is plain text, seed hashes it with bcrypt.
-- If `ADMIN_PASSWORD` is already a bcrypt hash (`$2...`), seed stores it directly.
+```env
+DATABASE_URL=postgresql://...            # Neon/Supabase/Prisma Postgres
+DATABASE_PROVIDER=postgresql
+STORAGE_PROVIDER=netlify-blobs
+NETLIFY_BLOBS_STORE=globalmerch-uploads
+ADMIN_EMAIL=admin@yourdomain.com
+ADMIN_PASSWORD=StrongPassword123!
+AUTH_SECRET=long-random-secret
+SITE_URL=https://your-site.netlify.app
+WHATSAPP_NUMBER=919999999999
+EMAIL_PROVIDER_API_KEY=...               # if using Resend
+EMAIL_FROM=no-reply@yourdomain.com
+# OR SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS/EMAIL_FROM
+```
 
-## Environment Variables
+5. Before first production deploy, apply schema + seed to production DB once from your machine:
 
-Required:
+```bash
+DATABASE_URL="postgresql://..." npm run prisma:generate
+DATABASE_URL="postgresql://..." npm run prisma:push
+DATABASE_URL="postgresql://..." ADMIN_EMAIL="admin@yourdomain.com" ADMIN_PASSWORD="StrongPassword123!" npm run prisma:seed
+```
 
-- `DATABASE_URL="file:./dev.db"`
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-- `SITE_URL`
-- `WHATSAPP_NUMBER`
+6. Trigger Netlify deploy.
 
-Email (choose one path):
+## Admin login
 
-- Resend:
-  - `EMAIL_PROVIDER_API_KEY`
-  - `EMAIL_FROM`
+- URL: `/admin/login`
+- Uses `ADMIN_EMAIL` + `ADMIN_PASSWORD` from env.
 
-- SMTP:
-  - `SMTP_HOST`
-  - `SMTP_PORT`
-  - `SMTP_USER`
-  - `SMTP_PASS`
-  - `EMAIL_FROM`
+## Storage behavior
 
-Auth:
+- `STORAGE_PROVIDER=local`
+  - Saves uploads to `public/uploads` (dev only)
+- `STORAGE_PROVIDER=netlify-blobs`
+  - Saves files to Netlify Blobs
+  - Files served via `/api/media/[...path]`
 
-- `AUTH_SECRET` (recommended, fallback is `ADMIN_PASSWORD`)
-
-## Useful Commands
+## Commands
 
 ```bash
 npm run dev
 npm run lint
 npm run build
+npm run build:netlify
 npm run prisma:generate
-npm run prisma:migrate
 npm run prisma:push
 npm run prisma:seed
 ```
-
-## Notes for Production (Vercel)
-
-- Replace SQLite with Postgres by changing Prisma datasource provider/url.
-- Swap local storage adapter with S3/R2 adapter (same interface in `lib/storage/adapter.ts`).
-- Set all env vars in Vercel project settings.
-- Keep `/admin` credentials strong and rotate `AUTH_SECRET`.
-- Migration SQL baseline is committed in `prisma/migrations/20260223110500_init/migration.sql`.

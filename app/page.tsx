@@ -20,6 +20,8 @@ export const metadata = buildPageMetadata({
   path: "/",
 });
 
+export const dynamic = "force-dynamic";
+
 const logisticsSteps = [
   "Inquiry",
   "Sourcing",
