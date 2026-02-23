@@ -1,0 +1,44 @@
+:root {
+  --gm-color-bg: #111111;
+  --gm-color-surface: #171717;
+  --gm-color-surface-soft: #1f1f1f;
+  --gm-color-card: #1a1a1a;
+  --gm-color-border: #2b2b2b;
+  --gm-color-text: #f5f5f5;
+  --gm-color-text-muted: #c7c7c7;
+  --gm-color-gold: #c6a45d;
+  --gm-color-gold-soft: #a88742;
+  --gm-color-success: #3aa06e;
+  --gm-color-danger: #d16666;
+
+  --gm-space-1: 0.25rem;
+  --gm-space-2: 0.5rem;
+  --gm-space-3: 0.75rem;
+  --gm-space-4: 1rem;
+  --gm-space-5: 1.25rem;
+  --gm-space-6: 1.5rem;
+  --gm-space-8: 2rem;
+  --gm-space-10: 2.5rem;
+  --gm-space-12: 3rem;
+  --gm-space-16: 4rem;
+  --gm-space-20: 5rem;
+
+  --gm-radius-sm: 0.5rem;
+  --gm-radius-md: 0.75rem;
+  --gm-radius-lg: 1rem;
+  --gm-radius-xl: 1.5rem;
+
+  --gm-shadow-sm: 0 4px 16px rgb(0 0 0 / 0.22);
+  --gm-shadow-md: 0 8px 28px rgb(0 0 0 / 0.3);
+  --gm-shadow-lg: 0 20px 48px rgb(0 0 0 / 0.4);
+
+  --gm-text-xs: 0.75rem;
+  --gm-text-sm: 0.875rem;
+  --gm-text-base: 1rem;
+  --gm-text-lg: 1.125rem;
+  --gm-text-xl: 1.25rem;
+  --gm-text-2xl: 1.5rem;
+  --gm-text-3xl: 1.875rem;
+  --gm-text-4xl: 2.25rem;
+  --gm-text-5xl: 3rem;
+}

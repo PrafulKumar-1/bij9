@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local database and uploads
+dev.db
+dev.db-*
+public/uploads/*
+!public/uploads/.gitkeep

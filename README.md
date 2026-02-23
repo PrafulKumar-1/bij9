@@ -1,36 +1,145 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GlobalMerch Export
 
-## Getting Started
+Production-ready Next.js B2B merchant exporter website (India -> Worldwide) with premium UI, product catalog, enquiry funnels, and auth-protected admin dashboard.
 
-First, run the development server:
+## Stack
+
+- Next.js (App Router) + TypeScript
+- TailwindCSS + shadcn-style UI components
+- Framer Motion (subtle premium animations)
+- Prisma ORM + SQLite (Prisma 7 config + better-sqlite3 adapter, Postgres-upgrade friendly)
+- Custom JWT admin auth (`/admin`)
+- React Hook Form + Zod validation
+- Local filesystem upload adapter (`/public/uploads`) with future S3/R2-ready abstraction
+- Email notifications via Resend or SMTP (Nodemailer)
+- SEO metadata + JSON-LD + dynamic OG image + sitemap + robots
+
+## Features Implemented
+
+- Premium responsive public website:
+  - Home, Products, Product detail, Category detail
+  - Send Requirement, About, Compliance, Logistics, Contact
+  - Strong B2B CTAs on all pages
+- Product catalog:
+  - Search, category filter, sorting, pagination
+- Product detail:
+  - Gallery, specs table, packaging chips, brochure support, sticky enquiry panel
+- Admin dashboard (auth protected):
+  - Categories CRUD
+  - Products CRUD
+  - Media upload manager
+  - Enquiries status pipeline (New/Contacted/Quoted/Closed)
+  - Requirements status pipeline (New/Contacted/Quoted/Closed)
+  - CSV product import endpoint + page
+- End-to-end enquiry + requirement flow:
+  - Stores in database
+  - Sends admin email notifications
+- Seed data:
+  - 6 categories + 12 products including dehydrated mushroom, onion, garlic
+- Local placeholder image pack:
+  - `hero.jpg`, `map.jpg`, `category-*.jpg`, `product-*.jpg`
+
+## Project Structure
+
+- `app/` routes and API handlers
+- `components/` reusable UI + page sections + admin/forms
+- `lib/` db/auth/storage/validators/seo/utils
+- `styles/` design tokens
+- `prisma/` schema + seed
+- `public/` media placeholders and uploads
+
+## Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create env file:
+
+```bash
+cp .env.example .env
+```
+
+3. Generate Prisma client:
+
+```bash
+npm run prisma:generate
+```
+
+4. Apply schema to local database:
+
+```bash
+npm run prisma:migrate
+```
+
+5. Seed database:
+
+```bash
+npm run prisma:seed
+```
+
+6. Start dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Admin Login
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- URL: `http://localhost:3000/admin/login`
+- Credentials come from `.env`:
+  - `ADMIN_EMAIL`
+  - `ADMIN_PASSWORD`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Seed behavior:
+- If `ADMIN_PASSWORD` is plain text, seed hashes it with bcrypt.
+- If `ADMIN_PASSWORD` is already a bcrypt hash (`$2...`), seed stores it directly.
 
-## Learn More
+## Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+Required:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `DATABASE_URL="file:./dev.db"`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `SITE_URL`
+- `WHATSAPP_NUMBER`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Email (choose one path):
 
-## Deploy on Vercel
+- Resend:
+  - `EMAIL_PROVIDER_API_KEY`
+  - `EMAIL_FROM`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- SMTP:
+  - `SMTP_HOST`
+  - `SMTP_PORT`
+  - `SMTP_USER`
+  - `SMTP_PASS`
+  - `EMAIL_FROM`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Auth:
+
+- `AUTH_SECRET` (recommended, fallback is `ADMIN_PASSWORD`)
+
+## Useful Commands
+
+```bash
+npm run dev
+npm run lint
+npm run build
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:push
+npm run prisma:seed
+```
+
+## Notes for Production (Vercel)
+
+- Replace SQLite with Postgres by changing Prisma datasource provider/url.
+- Swap local storage adapter with S3/R2 adapter (same interface in `lib/storage/adapter.ts`).
+- Set all env vars in Vercel project settings.
+- Keep `/admin` credentials strong and rotate `AUTH_SECRET`.
+- Migration SQL baseline is committed in `prisma/migrations/20260223110500_init/migration.sql`.

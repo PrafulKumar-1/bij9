@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Category {
+  id           String    @id @default(cuid())
+  name         String
+  slug         String    @unique
+  description  String
+  heroImageUrl String
+  products     Product[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Product {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  categoryId       String
+  category         Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  shortDescription String
+  description      String
+  originCountry    String
+  moqValue         Int
+  moqUnit          String
+  packagingOptions String
+  leadTimeDays     Int
+  certifications   String
+  hsCode           String?
+  featured         Boolean       @default(false)
+  brochureUrl      String?
+  status           String        @default("draft")
+  popularity       Int           @default(0)
+  images           ProductImage[]
+  enquiries        Enquiry[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([categoryId])
+  @@index([status, featured])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Enquiry {
+  id        String       @id @default(cuid())
+  type      String
+  productId String?
+  product   Product?     @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  country   String?
+  message   String
+  status    String        @default("NEW")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model RequirementRequest {
+  id            String            @id @default(cuid())
+  productName   String
+  quantity      String
+  unit          String
+  targetCountry String
+  qualitySpec   String
+  packaging     String
+  targetPrice   String?
+  incoterms     String
+  timeline      String
+  attachments   String
+  name          String
+  email         String
+  phone         String?
+  company       String?
+  country       String?
+  message       String?
+  status        String @default("NEW")
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         String   @default("SUPER_ADMIN")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
