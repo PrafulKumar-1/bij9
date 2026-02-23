@@ -38,9 +38,9 @@ export class NetlifyBlobsStorageAdapter implements StorageAdapter {
     const key = `${safeFolder}/${filename}`;
 
     const store = getStore(getStoreName());
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const arrayBuffer = await file.arrayBuffer();
 
-    await store.set(key, buffer, {
+    await store.set(key, arrayBuffer, {
       metadata: {
         contentType: file.type,
         originalName: file.name,

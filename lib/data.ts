@@ -42,8 +42,8 @@ export async function getPublishedProducts(params: {
     ...(params.search
       ? {
           OR: [
-            { title: { contains: params.search } },
-            { shortDescription: { contains: params.search } },
+            { title: { contains: params.search, mode: "insensitive" } },
+            { shortDescription: { contains: params.search, mode: "insensitive" } },
           ],
         }
       : {}),
