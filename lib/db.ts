@@ -8,7 +8,7 @@ declare global {
 function createPrismaClient() {
   const adapter = new PrismaPg({
     connectionString:
-      process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/globalmerch?schema=public",
+      process.env.DATABASE_URL ?? "postgresql://neondb_owner:npg_9zDQLXiI8Rfb@ep-gentle-fire-a856ayqd-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require",
   });
 
   return new PrismaClient({ adapter });

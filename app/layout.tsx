@@ -63,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${fontBody.variable} ${fontHeading.variable} bg-[var(--gm-color-bg)] text-[var(--gm-color-text)] antialiased`}>
         <AppShell contactEmail={env.ADMIN_EMAIL} whatsappNumber={env.WHATSAPP_NUMBER}>
           {children}

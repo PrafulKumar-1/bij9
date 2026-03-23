@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 import { ADMIN_TOKEN_COOKIE, verifyAdminToken } from "@/lib/auth";
 
-const PUBLIC_ADMIN_PATHS = ["/admin/login"];
+const PUBLIC_ADMIN_PATHS = ["/admin/login", "/api/admin/login"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
