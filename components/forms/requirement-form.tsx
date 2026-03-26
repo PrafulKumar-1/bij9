@@ -143,7 +143,7 @@ export function RequirementForm() {
             <SelectValue placeholder="Select Incoterms" />
           </SelectTrigger>
           <SelectContent>
-            {INCOTERMS.map((term) => (
+            {INCOTERMS.map((term: (typeof INCOTERMS)[number]) => (
               <SelectItem key={term} value={term}>
                 {term}
               </SelectItem>
@@ -159,7 +159,7 @@ export function RequirementForm() {
         {uploading ? <p className="text-xs text-[var(--gm-color-gold)]">Uploading files...</p> : null}
         {attachments?.length ? (
           <ul className="space-y-1 text-xs text-[var(--gm-color-text-muted)]">
-            {attachments.map((item) => (
+            {attachments.map((item: string) => (
               <li key={item}>{item}</li>
             ))}
           </ul>

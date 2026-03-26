@@ -2,10 +2,22 @@ import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
+function getDatabaseUrl() {
+  const connectionString = process.env.DIRECT_URL?.trim() || process.env.DATABASE_URL?.trim();
+
+  if (!connectionString) {
+    throw new Error("DATABASE_URL or DIRECT_URL is not set. Add one to your .env file before running Prisma commands.");
+  }
+
+  return connectionString;
+}
+
 const prisma = new PrismaClient({
   adapter: new PrismaPg({
-    connectionString:
-      process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/globalmerch?schema=public",
+    connectionString: getDatabaseUrl(),
+    connectionTimeoutMillis: 15_000,
+    idleTimeoutMillis: 300_000,
+    max: 1,
   }),
 });
 

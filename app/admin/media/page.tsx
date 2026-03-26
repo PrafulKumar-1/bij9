@@ -5,6 +5,8 @@ import { getStore } from "@netlify/blobs";
 import { MediaUploadForm } from "@/components/admin/media-upload-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+type UploadedFile = Awaited<ReturnType<typeof listUploadedFiles>>[number];
+
 export default async function AdminMediaPage() {
   const files = await listUploadedFiles();
 
@@ -25,7 +27,7 @@ export default async function AdminMediaPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm text-[var(--gm-color-text-muted)]">
-            {files.length ? files.map((file) => <div key={file}>{file}</div>) : <p>No uploads yet.</p>}
+            {files.length ? files.map((file: UploadedFile) => <div key={file}>{file}</div>) : <p>No uploads yet.</p>}
           </div>
         </CardContent>
       </Card>
@@ -33,7 +35,7 @@ export default async function AdminMediaPage() {
   );
 }
 
-async function listUploadedFiles() {
+async function listUploadedFiles(): Promise<string[]> {
   if (process.env.STORAGE_PROVIDER === "netlify-blobs") {
     try {
       const store = getStore(process.env.NETLIFY_BLOBS_STORE || "globalmerch-uploads");

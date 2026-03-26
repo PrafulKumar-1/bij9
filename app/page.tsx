@@ -21,6 +21,8 @@ export const metadata = buildPageMetadata({
 });
 
 export const dynamic = "force-dynamic";
+type HomeCategory = Awaited<ReturnType<typeof getPublishedCategories>>[number];
+type HomeProduct = Awaited<ReturnType<typeof getFeaturedProducts>>[number];
 
 const logisticsSteps = [
   "Inquiry",
@@ -48,7 +50,8 @@ const testimonials = [
 ];
 
 export default async function HomePage() {
-  const [categories, featuredProducts] = await Promise.all([getPublishedCategories(), getFeaturedProducts(6)]);
+  const categories = await getPublishedCategories();
+  const featuredProducts = await getFeaturedProducts(6);
   const t = getDictionary("en");
 
   return (
@@ -94,7 +97,7 @@ export default async function HomePage() {
             title="Premium category coverage for global procurement"
           />
           <div className="grid gap-5 md:grid-cols-3">
-            {categories.slice(0, 6).map((category) => (
+            {categories.slice(0, 6).map((category: HomeCategory) => (
               <Link
                 className="group relative h-72 overflow-hidden rounded-xl border border-[var(--gm-color-border)]"
                 href={`/categories/${category.slug}`}
@@ -126,7 +129,7 @@ export default async function HomePage() {
             title="High-demand export products"
           />
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredProducts.map((product) => (
+            {featuredProducts.map((product: HomeProduct) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

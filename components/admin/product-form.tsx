@@ -20,8 +20,8 @@ export function ProductForm({
   product?: ProductWithImages | null;
 }) {
   const imagesValue = product?.images
-    ?.sort((a, b) => a.sortOrder - b.sortOrder)
-    .map((image) => `${image.url}|${image.alt}`)
+    ?.sort((a: ProductImage, b: ProductImage) => a.sortOrder - b.sortOrder)
+    .map((image: ProductImage) => `${image.url}|${image.alt}`)
     .join("\n");
 
   return (
@@ -35,7 +35,7 @@ export function ProductForm({
 
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Title">
-              <Input defaultValue={product?.title} name="title" required />
+              <Input defaultValue={product?.title} minLength={3} name="title" required />
             </Field>
             <Field label="Slug">
               <Input defaultValue={product?.slug} name="slug" />
@@ -48,7 +48,7 @@ export function ProductForm({
                 required
               >
                 <option value="">Select category</option>
-                {categories.map((category) => (
+                {categories.map((category: Category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -56,16 +56,16 @@ export function ProductForm({
               </select>
             </Field>
             <Field label="Origin Country">
-              <Input defaultValue={product?.originCountry} name="originCountry" required />
+              <Input defaultValue={product?.originCountry} minLength={2} name="originCountry" required />
             </Field>
             <Field label="MOQ Value">
-              <Input defaultValue={product?.moqValue} name="moqValue" required type="number" />
+              <Input defaultValue={product?.moqValue} min={1} name="moqValue" required type="number" />
             </Field>
             <Field label="MOQ Unit">
               <Input defaultValue={product?.moqUnit} name="moqUnit" placeholder="kg" required />
             </Field>
             <Field label="Lead Time (Days)">
-              <Input defaultValue={product?.leadTimeDays} name="leadTimeDays" required type="number" />
+              <Input defaultValue={product?.leadTimeDays} min={1} name="leadTimeDays" required type="number" />
             </Field>
             <Field label="HS Code (optional)">
               <Input defaultValue={product?.hsCode ?? ""} name="hsCode" />
@@ -86,11 +86,26 @@ export function ProductForm({
           </div>
 
           <Field label="Short Description">
-            <Textarea defaultValue={product?.shortDescription} name="shortDescription" required />
+            <Textarea
+              defaultValue={product?.shortDescription}
+              minLength={10}
+              name="shortDescription"
+              placeholder="At least 10 characters"
+              required
+            />
+            <p className="text-xs text-[var(--gm-color-text-muted)]">Use at least 10 characters.</p>
           </Field>
 
           <Field label="Product Description (Markdown)">
-            <Textarea className="min-h-52" defaultValue={product?.description} name="description" required />
+            <Textarea
+              className="min-h-52"
+              defaultValue={product?.description}
+              minLength={20}
+              name="description"
+              placeholder="Add a fuller product description with at least 20 characters"
+              required
+            />
+            <p className="text-xs text-[var(--gm-color-text-muted)]">Use at least 20 characters.</p>
           </Field>
 
           <Field label="Packaging Options (comma separated)">

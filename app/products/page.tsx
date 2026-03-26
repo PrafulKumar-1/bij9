@@ -14,6 +14,8 @@ export const metadata = buildPageMetadata({
 });
 
 export const dynamic = "force-dynamic";
+type CatalogCategory = Awaited<ReturnType<typeof getPublishedCategories>>[number];
+type CatalogProduct = Awaited<ReturnType<typeof getPublishedProducts>>["products"][number];
 
 export default async function ProductsPage({
   searchParams,
@@ -56,7 +58,7 @@ export default async function ProductsPage({
             name="category"
           >
             <option value="">All categories</option>
-            {categories.map((category) => (
+            {categories.map((category: CatalogCategory) => (
               <option key={category.id} value={category.slug}>
                 {category.name}
               </option>
@@ -76,7 +78,7 @@ export default async function ProductsPage({
       </section>
 
       <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {productData.products.map((product) => (
+        {productData.products.map((product: CatalogProduct) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </section>

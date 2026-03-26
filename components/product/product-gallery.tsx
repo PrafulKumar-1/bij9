@@ -23,7 +23,7 @@ export function ProductGallery({ images, title }: { images: ProductImage[]; titl
         />
       </div>
       <div className="grid grid-cols-4 gap-3">
-        {images.map((image, index) => (
+        {images.map((image: ProductImage, index: number) => (
           <button
             className={cn(
               "relative aspect-square overflow-hidden rounded-md border",

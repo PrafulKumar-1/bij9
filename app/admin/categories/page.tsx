@@ -13,9 +13,21 @@ import {
 } from "@/components/ui/table";
 import { db } from "@/lib/db";
 
-export default async function CategoriesPage() {
-  const categories = await db.category.findMany({
+type CategoryRow = Awaited<ReturnType<typeof db.category.findMany>>[number];
+
+export default async function CategoriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+  const categories: CategoryRow[] = await db.category.findMany({
     orderBy: { updatedAt: "desc" },
+    include: {
+      _count: {
+        select: { products: true },
+      },
+    },
   });
 
   return (
@@ -27,19 +39,26 @@ export default async function CategoriesPage() {
         </Button>
       </CardHeader>
       <CardContent>
+        {error ? (
+          <div className="mb-4 rounded-md border border-[var(--gm-color-danger)]/40 bg-[var(--gm-color-danger)]/10 px-4 py-3 text-sm text-rose-200">
+            {error}
+          </div>
+        ) : null}
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Slug</TableHead>
+              <TableHead>Products</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((category) => (
+            {categories.map((category: CategoryRow) => (
               <TableRow key={category.id}>
                 <TableCell>{category.name}</TableCell>
                 <TableCell>{category.slug}</TableCell>
+                <TableCell>{category._count.products}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button asChild size="sm" variant="secondary">
@@ -47,7 +66,17 @@ export default async function CategoriesPage() {
                     </Button>
                     <form action={deleteCategoryAction}>
                       <input name="id" type="hidden" value={category.id} />
-                      <Button size="sm" type="submit" variant="destructive">
+                      <Button
+                        disabled={category._count.products > 0}
+                        size="sm"
+                        title={
+                          category._count.products > 0
+                            ? "Delete products in this category first"
+                            : "Delete category"
+                        }
+                        type="submit"
+                        variant="destructive"
+                      >
                         Delete
                       </Button>
                     </form>

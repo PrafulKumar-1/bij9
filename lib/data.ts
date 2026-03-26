@@ -4,8 +4,13 @@ import { db } from "@/lib/db";
 import { parseJsonArray } from "@/lib/utils";
 
 type ProductSort = "newest" | "moq" | "popular";
+type CategoryWithCount = Awaited<ReturnType<typeof db.category.findMany>>[number];
+type ProductWithCategoryAndImages = Awaited<ReturnType<typeof db.product.findMany>>[number];
+type ProductDetailRecord = Awaited<ReturnType<typeof db.product.findUnique>>;
+type CategoryDetailRecord = Awaited<ReturnType<typeof db.category.findUnique>>;
+type NormalizedProduct = ReturnType<typeof normalizeProduct<ProductWithCategoryAndImages>>;
 
-export async function getPublishedCategories() {
+export async function getPublishedCategories(): Promise<CategoryWithCount[]> {
   return db.category.findMany({
     orderBy: { name: "asc" },
     include: {
@@ -16,7 +21,7 @@ export async function getPublishedCategories() {
   });
 }
 
-export async function getFeaturedProducts(limit = 6) {
+export async function getFeaturedProducts(limit = 6): Promise<NormalizedProduct[]> {
   const products = await db.product.findMany({
     where: { status: "published", featured: true },
     include: { images: { orderBy: { sortOrder: "asc" } }, category: true },
@@ -33,7 +38,13 @@ export async function getPublishedProducts(params: {
   sort?: ProductSort;
   page?: number;
   pageSize?: number;
-}) {
+}): Promise<{
+  products: NormalizedProduct[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}> {
   const page = Math.max(1, params.page ?? 1);
   const pageSize = Math.min(24, Math.max(1, params.pageSize ?? 9));
 
@@ -86,7 +97,7 @@ export async function getPublishedProducts(params: {
   };
 }
 
-export async function getProductBySlug(slug: string) {
+export async function getProductBySlug(slug: string): Promise<NormalizedProduct | null> {
   const product = await db.product.findUnique({
     where: { slug },
     include: {
@@ -102,7 +113,7 @@ export async function getProductBySlug(slug: string) {
   return normalizeProduct(product);
 }
 
-export async function getRelatedProducts(productId: string, categoryId: string) {
+export async function getRelatedProducts(productId: string, categoryId: string): Promise<NormalizedProduct[]> {
   const products = await db.product.findMany({
     where: {
       id: { not: productId },
@@ -120,7 +131,7 @@ export async function getRelatedProducts(productId: string, categoryId: string) 
   return products.map(normalizeProduct);
 }
 
-export async function getCategoryBySlug(slug: string) {
+export async function getCategoryBySlug(slug: string): Promise<(NonNullable<CategoryDetailRecord> & { products: NormalizedProduct[] }) | null> {
   const category = await db.category.findUnique({
     where: { slug },
     include: {
@@ -157,7 +168,11 @@ export function normalizeProduct<T extends {
   packagingOptions: string;
   certifications: string;
   images: Array<{ url: string; alt: string; sortOrder: number }>;
-}>(product: T) {
+}>(product: T): T & {
+  packagingOptions: string[];
+  certifications: string[];
+  images: Array<{ url: string; alt: string; sortOrder: number }>;
+} {
   return {
     ...product,
     packagingOptions: parseJsonArray(product.packagingOptions),

@@ -11,8 +11,10 @@ import { ENQUIRY_STATUSES } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { formatDate } from "@/lib/utils";
 
+type EnquiryRow = Awaited<ReturnType<typeof db.enquiry.findMany>>[number];
+
 export default async function AdminEnquiriesPage() {
-  const enquiries = await db.enquiry.findMany({
+  const enquiries: EnquiryRow[] = await db.enquiry.findMany({
     include: { product: true },
     orderBy: { createdAt: "desc" },
   });
@@ -31,7 +33,7 @@ export default async function AdminEnquiriesPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {enquiries.map((enquiry) => (
+          {enquiries.map((enquiry: EnquiryRow) => (
             <TableRow key={enquiry.id}>
               <TableCell>{formatDate(enquiry.createdAt)}</TableCell>
               <TableCell>

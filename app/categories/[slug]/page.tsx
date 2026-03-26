@@ -7,6 +7,8 @@ import { getCategoryBySlug } from "@/lib/data";
 import { buildPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+type CategoryPageData = NonNullable<Awaited<ReturnType<typeof getCategoryBySlug>>>;
+type CategoryProduct = CategoryPageData["products"][number];
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -52,7 +54,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       </section>
 
       <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {category.products.map((product) => (
+        {category.products.map((product: CategoryProduct) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </section>

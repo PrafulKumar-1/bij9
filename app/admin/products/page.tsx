@@ -14,8 +14,10 @@ import {
 import { db } from "@/lib/db";
 import { formatDate } from "@/lib/utils";
 
+type ProductRow = Awaited<ReturnType<typeof db.product.findMany>>[number];
+
 export default async function AdminProductsPage() {
-  const products = await db.product.findMany({
+  const products: ProductRow[] = await db.product.findMany({
     include: { category: true },
     orderBy: { updatedAt: "desc" },
   });
@@ -40,7 +42,7 @@ export default async function AdminProductsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => (
+            {products.map((product: ProductRow) => (
               <TableRow key={product.id}>
                 <TableCell>{product.title}</TableCell>
                 <TableCell>{product.category.name}</TableCell>

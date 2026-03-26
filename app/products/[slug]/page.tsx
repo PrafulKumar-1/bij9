@@ -20,6 +20,7 @@ import { getProductBySlug, getRelatedProducts } from "@/lib/data";
 import { buildPageMetadata, productJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+type RelatedProduct = Awaited<ReturnType<typeof getRelatedProducts>>[number];
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -151,7 +152,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </Button>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {related.map((item) => (
+          {related.map((item: RelatedProduct) => (
             <ProductCard key={item.id} product={item} />
           ))}
         </div>

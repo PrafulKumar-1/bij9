@@ -11,8 +11,10 @@ import { REQUIREMENT_STATUSES } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { formatDate, parseJsonArray } from "@/lib/utils";
 
+type RequirementRow = Awaited<ReturnType<typeof db.requirementRequest.findMany>>[number];
+
 export default async function AdminRequirementsPage() {
-  const requirements = await db.requirementRequest.findMany({
+  const requirements: RequirementRow[] = await db.requirementRequest.findMany({
     orderBy: { createdAt: "desc" },
   });
 
@@ -30,7 +32,7 @@ export default async function AdminRequirementsPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {requirements.map((item) => (
+          {requirements.map((item: RequirementRow) => (
             <TableRow key={item.id}>
               <TableCell>{formatDate(item.createdAt)}</TableCell>
               <TableCell>

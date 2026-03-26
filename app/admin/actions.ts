@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { requireAdminSession } from "@/lib/auth";
@@ -71,6 +72,23 @@ export async function deleteCategoryAction(formData: FormData) {
   const id = String(formData.get("id") || "");
   if (!id) {
     throw new Error("Missing category id");
+  }
+
+  const linkedProducts = await db.product.count({
+    where: { categoryId: id },
+  });
+
+  if (linkedProducts > 0) {
+    const referer = (await headers()).get("referer");
+    const target = referer ? new URL(referer) : new URL("/admin/categories", "http://localhost");
+    const productLabel = linkedProducts === 1 ? "product" : "products";
+
+    target.searchParams.set(
+      "error",
+      `Delete the ${linkedProducts} ${productLabel} in this category before removing it.`,
+    );
+
+    redirect(`${target.pathname}?${target.searchParams.toString()}`);
   }
 
   await db.category.delete({ where: { id } });
